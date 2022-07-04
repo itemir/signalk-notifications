@@ -1,0 +1,27 @@
+{
+  "name": "signalk-notifications",
+  "version": "0.0.1",
+  "description": "Manage SignalK notifications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-webapp"
+  ],
+  "author": "Ilker Temir",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "request": "^2.88.0",
+    "sqlite3": "^5.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itemir/signalk-notifications.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itemir/signalk-notifications/issues"
+  },
+  "homepage": "https://github.com/itemir/signalk-notifications#readme"
+}

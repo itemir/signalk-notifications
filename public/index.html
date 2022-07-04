@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="bootstrap-5.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="bootstrap-5.1.3/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="jquery-3.6.0.min.js"></script>
+    <title>Notifications Manager</title>
+    <style>
+      a {text-decoration: none;>
+    </style>
+  </head>
+  <body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <div class="container-fluid">
+	    <a class="navbar-brand" href="#">Signal K Notifications</a>
+	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	      <span class="navbar-toggler-icon"></span>
+	    </button>
+	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	    </div>
+	  </div>
+	</nav>
+	<table class="table">
+	    <thead>
+	       <tr>
+		    <th scope="col">Time</th>
+		    <th scope="col">Alarm</th>
+		    <th scope="col">Priority</th>
+		    <th scope="col">Message</th>
+		    <th scope="col" style="width: 40px;">Action</th>
+	       </tr>
+	    </thead>
+	    <tbody id="content">
+	    </tbody>
+	</table>
+	<script>
+	  function updateTable() {
+	    $.get("/plugins/notifications/getNotifications", function(data) {
+		$('#content').empty();
+	  	for (let i in data) {
+			let row = data[i];
+			let date = new Date(0); // The 0 there is the key, which sets the date to the epoch
+			date.setUTCSeconds(row.ts/1000);
+		        $('#content').append('<tr>' +
+				`<td>` +
+				`<a href="http://www.google.com/maps/place/${row.latitude},${row.longitude}/data=!3m1!1e3" target="_new">` +
+				`<img src="map_icon.png" style="width:19px; height: 19px; margin-right: 4px;"/> ` +
+				`</a>` +
+				`${date.toLocaleString()}` +
+				`</td>` +
+				`<td>${row.type} (${row.count})</td>` +
+				`<td>${row.priority}</td>` +
+				`<td>${row.message}</td>` +
+				`<td>` +
+				`<div class="dropdown">` +
+				`  <a style="text-decoration: none; color: black;" class="btn btn-link" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">` +
+				`    ...` +
+				`  </a>` +
+				`  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">` +
+				`    <li><a class="dropdown-item" href="#" onclick="deleteNotification(${row.rowid})">Delete</a></li>` +
+				`    <li><a class="dropdown-item" href="#" onclick="suppressNotificationType('${row.type}')">Suppress</a></li>` +
+				`  </ul>` +
+				`</div>` +
+				`</td>` +
+				'</tr>');
+	  	}
+	    });
+          }
+	  updateTable();
+	  setInterval(function() {
+	    updateTable()
+	  }, 15000);
+
+	  function deleteNotification(rowId) {
+            if(!confirm('Are you sure?')) {
+              e.preventDefault();
+            }
+	    $.post("/plugins/notifications/deleteNotification", {
+	      'rowid': rowId
+	    }, function(data) {
+	      updateTable();
+	    });
+	  }
+
+	  function suppressNotificationType(type) {
+  	    if(!confirm(`This will delete all ${type} notifications and suppress them. Are you sure?`)) {
+              e.preventDefault();
+            }
+	    $.post("/plugins/notifications/suppressNotificationType", {
+	      'type': type
+	    }, function(data) {
+	      updateTable();
+	    });
+	  }
+	</script>
+  </body>
+</html>
