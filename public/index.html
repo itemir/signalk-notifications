@@ -11,20 +11,35 @@
     <script src="jquery-3.6.0.min.js"></script>
     <title>Notifications Manager</title>
     <style>
-      a {text-decoration: none;>
+      a {
+	text-decoration:none;
+	color: black;
+      }
+      #suppressedNotifications {
+        display: none;
+      }
     </style>
   </head>
   <body>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	  <div class="container-fluid">
-	    <a class="navbar-brand" href="#">Signal K Notifications</a>
-	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	      <span class="navbar-toggler-icon"></span>
-	    </button>
-	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	    </div>
-	  </div>
-	</nav>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="notifications.png" style="width: 28px; height: 28px;"/></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        	<li class="nav-item">
+        	  <a class="nav-link active" aria-current="page" href="#" onclick="changePage('notifications')">Home</a>
+        	</li>
+    	        <li class="nav-item">
+	          <a class="nav-link" href="#" onclick="changePage('suppressedNotifications')">Suppressed Types</a>
+	        </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="notifications">
 	<table class="table">
 	    <thead>
 	       <tr>
@@ -35,68 +50,121 @@
 		    <th scope="col" style="width: 40px;">Action</th>
 	       </tr>
 	    </thead>
-	    <tbody id="content">
+	    <tbody id="notificationsContent">
 	    </tbody>
 	</table>
-	<script>
-	  function updateTable() {
-	    $.get("/plugins/notifications/getNotifications", function(data) {
-		$('#content').empty();
-	  	for (let i in data) {
-			let row = data[i];
-			let date = new Date(0); // The 0 there is the key, which sets the date to the epoch
-			date.setUTCSeconds(row.ts/1000);
-		        $('#content').append('<tr>' +
-				`<td>` +
-				`<a href="http://www.google.com/maps/place/${row.latitude},${row.longitude}/data=!3m1!1e3" target="_new">` +
-				`<img src="map_icon.png" style="width:19px; height: 19px; margin-right: 4px;"/> ` +
-				`</a>` +
-				`${date.toLocaleString()}` +
-				`</td>` +
-				`<td>${row.type} (${row.count})</td>` +
-				`<td>${row.priority}</td>` +
-				`<td>${row.message}</td>` +
-				`<td>` +
-				`<div class="dropdown">` +
-				`  <a style="text-decoration: none; color: black;" class="btn btn-link" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">` +
-				`    ...` +
-				`  </a>` +
-				`  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">` +
-				`    <li><a class="dropdown-item" href="#" onclick="deleteNotification(${row.rowid})">Delete</a></li>` +
-				`    <li><a class="dropdown-item" href="#" onclick="suppressNotificationType('${row.type}')">Suppress</a></li>` +
-				`  </ul>` +
-				`</div>` +
-				`</td>` +
-				'</tr>');
-	  	}
-	    });
-          }
-	  updateTable();
-	  setInterval(function() {
-	    updateTable()
-	  }, 15000);
-
-	  function deleteNotification(rowId) {
-            if(!confirm('Are you sure?')) {
-              e.preventDefault();
-            }
-	    $.post("/plugins/notifications/deleteNotification", {
-	      'rowid': rowId
-	    }, function(data) {
-	      updateTable();
-	    });
-	  }
-
-	  function suppressNotificationType(type) {
-  	    if(!confirm(`This will delete all ${type} notifications and suppress them. Are you sure?`)) {
-              e.preventDefault();
-            }
-	    $.post("/plugins/notifications/suppressNotificationType", {
-	      'type': type
-	    }, function(data) {
-	      updateTable();
-	    });
-	  }
-	</script>
+    </div>
+    <div id="suppressedNotifications">
+	<table class="table" style="max-width: 500px; margin: auto;">
+	    <thead>
+	       <tr>
+		    <th scope="col">Added on</th>
+		    <th scope="col">Notification Type</th>
+		    <th scope="col" style="width: 40px;">Action</th>
+	       </tr>
+	    </thead>
+	    <tbody id="suppressedNotificationsContent">
+	    </tbody>
+	</table>
+    </div>
   </body>
+  <script>
+  function updateTable() {
+    $.get("/plugins/notifications/getNotifications", function(data) {
+	$('#notificationsContent').empty();
+	for (let i in data) {
+		let row = data[i];
+		let date = new Date(0); // The 0 there is the key, which sets the date to the epoch
+		date.setUTCSeconds(row.ts/1000);
+		$('#notificationsContent').append('<tr>' +
+			`<td>` +
+			`<a href="http://www.google.com/maps/place/${row.latitude},${row.longitude}/data=!3m1!1e3" target="_new">` +
+			`<img src="map_icon.png" style="width:19px; height: 19px; margin-right: 4px;"/> ` +
+			`</a>` +
+			`${date.toLocaleString()}` +
+			`</td>` +
+			`<td>${row.type} (${row.count})</td>` +
+			`<td>${row.priority}</td>` +
+			`<td>${row.message}</td>` +
+			`<td>` +
+			`<div class="dropdown">` +
+			`  <a class="btn btn-link text-decoration-none text-dark" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">` +
+			`    ...` +
+			`  </a>` +
+			`  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">` +
+			`    <li><a class="dropdown-item" href="#" onclick="deleteNotification(${row.rowid})">Delete</a></li>` +
+			`    <li><a class="dropdown-item" href="#" onclick="suppressNotificationType('${row.type}')">Suppress</a></li>` +
+			`  </ul>` +
+			`</div>` +
+			`</td>` +
+			'</tr>');
+	}
+    });
+    $.get("/plugins/notifications/getSuppressedNotifications", function(data) {
+	$('#suppressedNotificationsContent').empty();
+	for (let i in data) {
+		let row = data[i];
+		let date = new Date(0); // The 0 there is the key, which sets the date to the epoch
+		date.setUTCSeconds(row.created_on/1000);
+		$('#suppressedNotificationsContent').append('<tr>' +
+			`<td>${date.toLocaleString()}` +
+			`<td>${row.type}</td>` +
+			`<td>` +
+			`<div class="dropdown">` +
+			`  <a class="btn btn-link text-decoration-none text-dark" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">` +
+			`    ...` +
+			`  </a>` +
+			`  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">` +
+			`    <li><a class="dropdown-item" href="#" onclick="unSuppressNotificationType('${row.type}')">Unsuppress</a></li>` +
+			`  </ul>` +
+			`</div>` +
+			`</td>` +
+			'</tr>');
+	}
+    });
+  }
+  updateTable();
+  setInterval(function() {
+    updateTable()
+  }, 15000);
+
+  function deleteNotification(rowId) {
+    if(!confirm('Are you sure?')) {
+      e.preventDefault();
+    }
+    $.post("/plugins/notifications/deleteNotification", {
+      'rowid': rowId
+    }, function(data) {
+      updateTable();
+    });
+  }
+
+  function suppressNotificationType(type) {
+    if(!confirm(`This will delete all ${type} notifications and suppress them. Are you sure?`)) {
+      e.preventDefault();
+    }
+    $.post("/plugins/notifications/suppressNotificationType", {
+      'type': type
+    }, function(data) {
+      updateTable();
+    });
+  }
+
+  function unSuppressNotificationType(type) {
+    if(!confirm(`Are you sure?`)) {
+      e.preventDefault();
+    }
+    $.post("/plugins/notifications/unSuppressNotificationType", {
+      'type': type
+    }, function(data) {
+      updateTable();
+    });
+  }
+
+  function changePage(page) {
+    $('#notifications').hide();
+    $('#suppressedNotifications').hide();
+    $(`#${page}`).show();
+  }
+  </script>
 </html>

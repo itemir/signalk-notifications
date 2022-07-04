@@ -167,6 +167,12 @@ module.exports = function(app) {
         res.send(data);
       });
     });
+    router.get("/getSuppressedNotifications", (req, res) => {
+      let query=`SELECT rowid, * FROM suppressed_notification_types ORDER BY created_on DESC`;
+      db.all(query, function(err, data) {
+        res.send(data);
+      });
+    });
     router.post("/deleteNotification", (req, res) => {
       let rowId = req.body.rowid;
       app.debug(`Deleting record with rowId ${rowId}`);
@@ -187,7 +193,18 @@ module.exports = function(app) {
         res.send('OK');
       });
     });
-  }
+    router.post("/unSuppressNotificationType", (req, res) => {
+      let type = req.body.type;
+      app.debug(`Unsuppressing notifications ${type}`);
+      db.run(`DELETE FROM suppressed_notification_types WHERE type="${type}"`, function() {
+	let index = suppressedNotificationTypes.indexOf(type);
+        if (index > -1) {
+          suppressedNotificationTypes.splice(index, 1);
+        }
+        res.send('OK');
+      });
+    });
+   }
 
   return plugin;
 }
