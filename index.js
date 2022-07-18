@@ -119,7 +119,9 @@ module.exports = function(app) {
 	db.run('INSERT INTO notifications VALUES(?, ?, ?, ?, ?, ?, ?)', values, function(err) {});
 	let date = new Date();
         app.setPluginStatus(`${message} at ${date}`);
-	sendPushNotification(message, type);
+	if (priority != "normal") {
+	  sendPushNotification(message, type);
+	}
       } else {
 	let rowId = data[0].rowid;
 	let count = data[0].count;

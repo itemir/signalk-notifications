@@ -1,6 +1,6 @@
 {
   "name": "signalk-notifications",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "SignalK Notifications Manager",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,10 @@
     "signalk-node-server-plugin",
     "signalk-webapp"
   ],
+  "signalk": {
+    "appIcon": "notifications-sk.png",
+    "displayName": "Notifications Manager"
+  },
   "author": "Ilker Temir",
   "license": "Apache-2.0",
   "dependencies": {
