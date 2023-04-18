@@ -111,7 +111,7 @@ module.exports = function(app) {
   function updateDatabase(ts, latitude, longitude, type, priority, message) {
     let now = new Date();
     let limit = now - 15*60*1000;
-    let query=`SELECT rowid, * FROM notifications WHERE type='${type}' AND ts >= ${limit} ORDER BY ts DESC LIMIT 1`;
+    let query=`SELECT rowid, * FROM notifications WHERE type='${type}' AND priority='${priority}' AND ts >= ${limit} ORDER BY ts DESC LIMIT 1`;
     db.all(query, function(err, data) {
       if (data.length == 0) {
         let values = [ts, 0, latitude, longitude, type, priority, message];
