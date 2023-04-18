@@ -164,10 +164,18 @@ module.exports = function(app) {
 
   plugin.registerWithRouter = function(router) {
     router.get("/getNotifications", (req, res) => {
-      let query=`SELECT rowid, * FROM notifications ORDER BY ts DESC`;
-      db.all(query, function(err, data) {
-        res.send(data);
-      });
+      if ('since' in req.query) {
+        let since = parseInt(req.query.since);
+        let query=`SELECT rowid, * FROM notifications where ts > ${since} ORDER BY ts DESC`;
+        db.all(query, function(err, data) {
+          res.send(data);
+        });
+      } else {
+        let query=`SELECT rowid, * FROM notifications ORDER BY ts DESC`;
+        db.all(query, function(err, data) {
+          res.send(data);
+        });
+      }
     });
     router.get("/getSuppressedNotifications", (req, res) => {
       let query=`SELECT rowid, * FROM suppressed_notification_types ORDER BY created_on DESC`;

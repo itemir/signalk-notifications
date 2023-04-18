@@ -1,6 +1,6 @@
 {
   "name": "signalk-notifications",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "SignalK Notifications Manager",
   "main": "index.js",
   "scripts": {
