@@ -1,6 +1,6 @@
 {
   "name": "signalk-notifications",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "SignalK Notifications Manager",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "signalk-webapp"
   ],
   "signalk": {
-    "appIcon": "notifications-sk.png",
+    "appIcon": "notifications-logo.png",
     "displayName": "Notifications Manager"
   },
   "author": "Ilker Temir",

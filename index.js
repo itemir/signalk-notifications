@@ -166,12 +166,12 @@ module.exports = function(app) {
     router.get("/getNotifications", (req, res) => {
       if ('since' in req.query) {
         let since = parseInt(req.query.since);
-        let query=`SELECT rowid, * FROM notifications where ts > ${since} ORDER BY ts DESC`;
+        let query=`SELECT rowid, * FROM notifications WHERE priority!="normal" AND ts > ${since} ORDER BY ts DESC`;
         db.all(query, function(err, data) {
           res.send(data);
         });
       } else {
-        let query=`SELECT rowid, * FROM notifications ORDER BY ts DESC`;
+        let query=`SELECT rowid, * FROM notifications WHERE priority!="normal" ORDER BY ts DESC`;
         db.all(query, function(err, data) {
           res.send(data);
         });
